@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة الرتب العسكرية</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: #fff;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .login-section {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #fff;
+        }
+
+        input, select {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            font-size: 16px;
+            direction: rtl;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #4834d4, #686de0);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #00d2d3, #54a0ff);
+        }
+
+        .dashboard {
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .sector-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .sector-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .sector-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #ffd700;
+            text-align: center;
+        }
+
+        .member-list {
+            margin-top: 15px;
+        }
+
+        .member-item {
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .member-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .member-name {
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .member-rank {
+            font-size: 0.9rem;
+            color: #ffd700;
+        }
+
+        .member-points {
+            font-size: 0.9rem;
+            color: #4ecdc4;
+        }
+
+        .add-member-form {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            display: none;
+        }
+
+        .add-member-form.active {
+            display: block;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .form-row input, .form-row select {
+            flex: 1;
+        }
+
+        .user-info {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,0,0,0.7);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,0,0,0.9);
+        }
+
+        .points-display {
+            font-size: 1.2rem;
+            color: #4ecdc4;
+            font-weight: bold;
+        }
+
+        .edit-points {
+            background: none;
+            border: 1px solid #4ecdc4;
+            color: #4ecdc4;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .edit-points:hover {
+            background: #4ecdc4;
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="logout-btn" onclick="logout()" style="display: none;" id="logoutBtn">تسجيل خروج</button>
+        
+        <div class="header">
+            <h1>🛡️   S R Q نظام العسكرية   ⚔️</h1>
+            <p>نظام لقطاعات العسكرية</p>
+        </div>
+
+        <!-- Login Section -->
+        <div class="login-section" id="loginSection">
+            <h2 style="text-align: center; margin-bottom: 20px;">تسجيل الدخول</h2>
+            <div class="login-form">
+                <div class="form-group">
+                    <label>نوع المستخدم:</label>
+                    <select id="userType">
+                        <option value="">اختر نوع المستخدم</option>
+                        <option value="owner">المالك</option>
+                        <option value="health">قطاع الصحة</option>
+                        <option value="special">القوات الخاصة</option>
+                        <option value="logistics">الخوية</option>
+                        <option value="traffic">المرور</option>
+                        <option value="user">مستخدم عادي</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>اسم المستخدم:</label>
+                    <input type="text" id="username" placeholder="أدخل اسم المستخدم">
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور:</label>
+                    <input type="password" id="password" placeholder="أدخل كلمة المرور">
+                </div>
+                <button class="btn" onclick="login()">تسجيل الدخول</button>
+            </div>
+        </div>
+
+        <!-- User Info -->
+        <div class="user-info" id="userInfo" style="display: none;">
+            <h3 id="welcomeMsg"></h3>
+            <p id="userDetails"></p>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="dashboard" id="dashboard">
+            <!-- Health Sector -->
+            <div class="sector-card" id="healthSector">
+                <div class="sector-title">🏥 قطاع الصحة</div>
+                <div class="member-list" id="healthMembers"></div>
+                <div class="add-member-form" id="healthAddForm">
+                    <h4>إضافة عضو جديد</h4>
+                    <div class="form-row">
+                        <input type="text" id="healthName" placeholder="الاسم">
+                        <input type="text" id="healthId" placeholder="الآيدي">
+                    </div>
+                    <div class="form-row">
+                        <select id="healthRank"></select>
+                        <input type="number" id="healthPoints" placeholder="النقاط" value="0">
+                    </div>
+                    <button class="btn btn-success" onclick="addMember('health')">إضافة</button>
+                </div>
+                <button class="btn btn-secondary" onclick="toggleAddForm('health')">إضافة عضو</button>
+            </div>
+
+            <!-- Special Forces Sector -->
+            <div class="sector-card" id="specialSector">
+                <div class="sector-title">⚡ القوات الخاصة</div>
+                <div class="member-list" id="specialMembers"></div>
+                <div class="add-member-form" id="specialAddForm">
+                    <h4>إضافة عضو جديد</h4>
+                    <div class="form-row">
+                        <input type="text" id="specialName" placeholder="الاسم">
+                        <input type="text" id="specialId" placeholder="الآيدي">
+                    </div>
+                    <div class="form-row">
+                        <select id="specialRank"></select>
+                        <input type="number" id="specialPoints" placeholder="النقاط" value="0">
+                    </div>
+                    <button class="btn btn-success" onclick="addMember('special')">إضافة</button>
+                </div>
+                <button class="btn btn-secondary" onclick="toggleAddForm('special')">إضافة عضو</button>
+            </div>
+
+            <!-- Logistics Sector -->
+            <div class="sector-card" id="logisticsSector">
+                <div class="sector-title">💂‍♀️لخويا</div>
+                <div class="member-list" id="logisticsMembers"></div>
+                <div class="add-member-form" id="logisticsAddForm">
+                    <h4>إضافة عضو جديد</h4>
+                    <div class="form-row">
+                        <input type="text" id="logisticsName" placeholder="الاسم">
+                        <input type="text" id="logisticsId" placeholder="الآيدي">
+                    </div>
+                    <div class="form-row">
+                        <select id="logisticsRank"></select>
+                        <input type="number" id="logisticsPoints" placeholder="النقاط" value="0">
+                    </div>
+                    <button class="btn btn-success" onclick="addMember('logistics')">إضافة</button>
+                </div>
+                <button class="btn btn-secondary" onclick="toggleAddForm('logistics')">إضافة عضو</button>
+            </div>
+
+            <!-- Traffic Sector -->
+            <div class="sector-card" id="trafficSector">
+                <div class="sector-title">🚦 المرور</div>
+                <div class="member-list" id="trafficMembers"></div>
+                <div class="add-member-form" id="trafficAddForm">
+                    <h4>إضافة عضو جديد</h4>
+                    <div class="form-row">
+                        <input type="text" id="trafficName" placeholder="الاسم">
+                        <input type="text" id="trafficId" placeholder="الآيدي">
+                    </div>
+                    <div class="form-row">
+                        <select id="trafficRank"></select>
+                        <input type="number" id="trafficPoints" placeholder="النقاط" value="0">
+                    </div>
+                    <button class="btn btn-success" onclick="addMember('traffic')">إضافة</button>
+                </div>
+                <button class="btn btn-secondary" onclick="toggleAddForm('traffic')">إضافة عضو</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Military Ranks with IDs
+        const militaryRanks = {
+            "🛡️⚔️⭐ منسوبي الصحه": "1384715826866950196",
+            "🛡️⚔️⭐ منسوبي القوات الخاصه": "1384715778200305856",
+            "🛡️⚔️⭐ منسوبي الخويا": "1384715820109926563",
+            "🛡️⚔️⭐ منسوبي المرور": "1384715826866950196",
+            "🛡️⚔️⭐ فريق اول": "1384715732268355764",
+            "🛡️⚔️⭐ فريق": "1384715738933100595",
+            "🛡️⚔️⭐ لواء": "1384715736701730866",
+            "🛡️⚔️⭐ عميد": "1384715738933100595",
+            "🛡️⚔️⭐ عقيد": "1384715741076521123",
+            "🛡️⚔️⭐ مقدم": "1384715743249170482",
+            "🛡️⚔️ رايد": "1384715745753305260",
+            "🛡️⚔️⭐ نقيب": "1384715748202512384",
+            "🛡️⚔️ ملازم أول": "1384715751159632002",
+            "🛡️⚔️⭐ ملازم ثاني": "1384715753407905832",
+            "🛡️⚔️⭐ مرشح ضابط": "1384715755517382827",
+            "🛡️⚔️ وكيل أول": "1384715757736169472",
+            "🛡️⚔️⭐ وكيل ثاني": "1384715760110276699",
+            "🛡️⚔️⭐ رقيب": "1384715762186584064",
+            "🛡️⚔️⭐ عريف": "1384715766376562864",
+            "🛡️⚔️ وكيل عريف": "1384715768821846106",
+            "🛡️⚔️⭐ جندي": "1384715770990428181"
+        };
+
+        // Default users with credentials
+        const defaultUsers = {
+            owner: { username: "owner", password: "admin123", name: "المالك الرئيسي" },
+            health: { username: "health_admin", password: "health123", name: "مدير قطاع الصحة" },
+            special: { username: "special_admin", password: "special123", name: "مدير القوات الخاصة" },
+            logistics: { username: "logistics_admin", password: "logistics123", name: "مدير لخويا " },
+            traffic: { username: "traffic_admin", password: "traffic123", name: "مدير المرور" },
+            user: { username: "user", password: "user123", name: "مستخدم عادي" }
+        };
+
+        // Data storage
+        let currentUser = null;
+        let militaryData = JSON.parse(localStorage?.getItem('militaryData') || 'null') || {
+            health: [],
+            special: [],
+            logistics: [],
+            traffic: []
+        };
+
+        // Initialize on page load
+        window.onload = function() {
+            populateRankDropdowns();
+            loadData();
+            checkStoredLogin();
+        };
+
+        function checkStoredLogin() {
+            const storedUser = sessionStorage?.getItem('currentUser');
+            if (storedUser) {
+                currentUser = JSON.parse(storedUser);
+                showDashboard();
+            }
+        }
+
+        function populateRankDropdowns() {
+            const sectors = ['health', 'special', 'logistics', 'traffic'];
+            
+            sectors.forEach(sector => {
+                const select = document.getElementById(sector + 'Rank');
+                select.innerHTML = '<option value="">اختر الرتبة</option>';
+                
+                Object.keys(militaryRanks).forEach(rank => {
+                    const option = document.createElement('option');
+                    option.value = rank;
+                    option.textContent = rank;
+                    select.appendChild(option);
+                });
+            });
+        }
+
+        function login() {
+            const userType = document.getElementById('userType').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (!userType || !username || !password) {
+                alert('يرجى ملء جميع الحقول');
+                return;
+            }
+
+            const user = defaultUsers[userType];
+            if (user && user.username === username && user.password === password) {
+                currentUser = { type: userType, name: user.name };
+                sessionStorage?.setItem('currentUser', JSON.stringify(currentUser));
+                showDashboard();
+            } else {
+                alert('بيانات تسجيل الدخول غير صحيحة');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            sessionStorage?.removeItem('currentUser');
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('userInfo').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('logoutBtn').style.display = 'none';
+            
+            // Clear form
+            document.getElementById('userType').value = '';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        function showDashboard() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('userInfo').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'grid';
+            document.getElementById('logoutBtn').style.display = 'block';
+            
+            // Update welcome message
+            document.getElementById('welcomeMsg').textContent = `مرحباً ${currentUser.name}`;
+            document.getElementById('userDetails').textContent = `نوع الحساب: ${getUserTypeArabic(currentUser.type)}`;
+            
+            setupDashboardPermissions();
+            displayAllMembers();
+        }
+
+        function getUserTypeArabic(type) {
+            const types = {
+                owner: 'المالك',
+                health: 'قطاع الصحة',
+                special: 'القوات الخاصة',
+                logistics: 'الخوية',
+                traffic: 'المرور',
+                user: 'مستخدم عادي'
+            };
+            return types[type] || type;
+        }
+
+        function setupDashboardPermissions() {
+            const sectors = ['health', 'special', 'logistics', 'traffic'];
+            
+            sectors.forEach(sector => {
+                const sectorCard = document.getElementById(sector + 'Sector');
+                const addForm = document.getElementById(sector + 'AddForm');
+                const addButton = sectorCard.querySelector('.btn-secondary');
+                
+                if (currentUser.type === 'owner' || currentUser.type === sector) {
+                    addButton.style.display = 'block';
+                } else {
+                    addButton.style.display = 'none';
+                    addForm.style.display = 'none';
+                }
+            });
+        }
+
+        function toggleAddForm(sector) {
+            const form = document.getElementById(sector + 'AddForm');
+            form.classList.toggle('active');
+        }
+
+        function addMember(sector) {
+            if (currentUser.type !== 'owner' && currentUser.type !== sector) {
+                alert('ليس لديك صلاحية لإضافة أعضاء في هذا القطاع');
+                return;
+            }
+
+            const name = document.getElementById(sector + 'Name').value;
+            const id = document.getElementById(sector + 'Id').value;
+            const rank = document.getElementById(sector + 'Rank').value;
+            const points = parseInt(document.getElementById(sector + 'Points').value) || 0;
+
+            if (!name || !id || !rank) {
+                alert('يرجى ملء جميع الحقول المطلوبة');
+                return;
+            }
+
+            const member = {
+                name: name,
+                id: id,
+                rank: rank,
+                points: points,
+                dateAdded: new Date().toISOString()
+            };
+
+            militaryData[sector].push(member);
+            saveData();
+            displayMembers(sector);
+            
+            // Clear form
+            document.getElementById(sector + 'Name').value = '';
+            document.getElementById(sector + 'Id').value = '';
+            document.getElementById(sector + 'Rank').value = '';
+            document.getElementById(sector + 'Points').value = '0';
+            
+            // Hide form
+            document.getElementById(sector + 'AddForm').classList.remove('active');
+            
+            alert('تم إضافة العضو بنجاح');
+        }
+
+        function displayAllMembers() {
+            const sectors = ['health', 'special', 'logistics', 'traffic'];
+            sectors.forEach(sector => displayMembers(sector));
+        }
+
+        function displayMembers(sector) {
+            const container = document.getElementById(sector + 'Members');
+            container.innerHTML = '';
+
+            militaryData[sector].forEach((member, index) => {
+                const memberDiv = document.createElement('div');
+                memberDiv.className = 'member-item';
+                memberDiv.innerHTML = `
+                    <div class="member-info">
+                        <div class="member-name">${member.name}</div>
+                        <div class="member-rank">${member.rank}</div>
+                        <div style="font-size: 0.8rem; color: #ccc;">الآيدي: ${member.id}</div>
+                    </div>
+                    <div>
+                        <span class="points-display">${member.points} نقطة</span>
+                        ${(currentUser.type === 'owner' || currentUser.type === sector) ? 
+                            `<button class="edit-points" onclick="editPoints('${sector}', ${index})">تعديل</button>
+                             <button class="edit-points" onclick="deleteMember('${sector}', ${index})" style="background: #ff4757; margin-right: 5px;">حذف</button>` : ''}
+                    </div>
+                `;
+                container.appendChild(memberDiv);
+            });
+
+            if (militaryData[sector].length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #ccc; padding: 20px;">لا توجد أعضاء في هذا القطاع</div>';
+            }
+        }
+
+        function editPoints(sector, index) {
+            if (currentUser.type !== 'owner' && currentUser.type !== sector) {
+                alert('ليس لديك صلاحية لتعديل النقاط');
+                return;
+            }
+
+            const currentPoints = militaryData[sector][index].points;
+            const newPoints = prompt('أدخل النقاط الجديدة:', currentPoints);
+            
+            if (newPoints !== null && !isNaN(newPoints)) {
+                militaryData[sector][index].points = parseInt(newPoints);
+                saveData();
+                displayMembers(sector);
+            }
+        }
+
+        function deleteMember(sector, index) {
+            if (currentUser.type !== 'owner' && currentUser.type !== sector) {
+                alert('ليس لديك صلاحية لحذف الأعضاء');
+                return;
+            }
+
+            if (confirm('هل أنت متأكد من حذف هذا العضو؟')) {
+                militaryData[sector].splice(index, 1);
+                saveData();
+                displayMembers(sector);
+            }
+        }
+
+        function saveData() {
+            try {
+                localStorage?.setItem('militaryData', JSON.stringify(militaryData));
+            } catch (e) {
+                console.log('Cannot save to localStorage, using memory storage');
+            }
+        }
+
+        function loadData() {
+            try {
+                const saved = localStorage?.getItem('militaryData');
+                if (saved) {
+                    militaryData = JSON.parse(saved);
+                }
+            } catch (e) {
+                console.log('Cannot load from localStorage, using default data');
+            }
+        }
+    </script>
+</body>
+</html>
